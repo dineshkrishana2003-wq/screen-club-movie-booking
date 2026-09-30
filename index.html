@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3efe6">
+  <title>Screen Club — Movie tickets, made memorable</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f3efe6;
+      --ink: #20211f;
+      --muted: #77776f;
+      --line: #d9d4c9;
+      --red: #d44832;
+      --red-dark: #a73120;
+      --lime: #d6ec78;
+      --blue: #405e9a;
+      --white: #fffdf8;
+      --mono: 'DM Mono', monospace;
+      --sans: 'DM Sans', sans-serif;
+      --serif: 'Playfair Display', Georgia, serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+    button, input, select { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+    .grain { position: fixed; inset: 0; z-index: 5; pointer-events: none; opacity: .12; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.18'/%3E%3C/svg%3E"); }
+    .shell { width: min(1240px, calc(100% - 72px)); margin: 0 auto; }
+    .topbar { height: 78px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); }
+    .brand { display: inline-flex; align-items: center; gap: 11px; color: var(--ink); text-decoration: none; }
+    .brand-mark { width: 30px; height: 30px; display: grid; place-items: center; background: var(--red); color: var(--white); font: 700 18px var(--serif); transform: rotate(-7deg); }
+    .brand-name { font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .brand-name small { display: block; margin-top: 3px; color: var(--muted); font: 9px var(--mono); letter-spacing: .16em; }
+    .nav { display: flex; align-items: center; gap: 34px; }
+    .nav a { color: #53534d; text-decoration: none; font-size: 13px; }
+    .nav a.active { color: var(--ink); font-weight: 700; }
+    .nav a:hover { color: var(--red); }
+    .header-tools { display: flex; gap: 12px; align-items: center; }
+    .city-select { border: 0; background: transparent; font-size: 12px; font-weight: 600; padding: 8px 22px 8px 5px; cursor: pointer; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; background: #e6dfd2; font: 11px var(--mono); }
+    main { padding-bottom: 84px; }
+    .intro { padding: 40px 0 24px; display: flex; align-items: end; justify-content: space-between; gap: 24px; }
+    .eyebrow { display: flex; align-items: center; gap: 9px; font: 10px var(--mono); text-transform: uppercase; letter-spacing: .12em; color: var(--red-dark); }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 4px #d448321c; }
+    h1 { max-width: 750px; margin: 10px 0 0; font: 600 clamp(40px, 5vw, 64px)/1.03 var(--serif); letter-spacing: 0; }
+    h1 em { color: var(--red); font-weight: 600; }
+    .intro-note { max-width: 220px; margin: 0 0 5px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .feature { min-height: 324px; position: relative; overflow: hidden; isolation: isolate; color: white; background: #292a27; display: grid; grid-template-columns: 1.1fr .9fr; }
+    .feature::before { content: ''; position: absolute; z-index: -1; inset: 0; background: linear-gradient(90deg, #171814 0%, #171814eb 34%, #17181461 64%, #17181418 100%), url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1800&q=85') center 48%/cover; }
+    .feature-copy { align-self: center; padding: 40px 0 40px 48px; max-width: 510px; }
+    .feature-tag { display: inline-flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--lime); color: var(--ink); font: 10px var(--mono); letter-spacing: .03em; text-transform: uppercase; }
+    .feature h2 { margin: 18px 0 7px; font: 600 46px/.99 var(--serif); }
+    .feature-subtitle { color: #e5dfd3; font-size: 13px; }
+    .feature-meta { display: flex; gap: 18px; margin: 20px 0 24px; color: #ddd8cc; font: 10px var(--mono); text-transform: uppercase; }
+    .feature-meta span + span::before { content: '•'; margin-right: 18px; color: var(--lime); }
+    .feature-actions { display: flex; align-items: center; gap: 18px; }
+    .primary-btn { border: 0; background: var(--red); color: white; min-height: 44px; padding: 0 20px; font-size: 12px; font-weight: 700; cursor: pointer; transition: background .18s, transform .18s; }
+    .primary-btn:hover { background: var(--red-dark); transform: translateY(-1px); }
+    .text-btn { border: 0; background: transparent; color: white; font-size: 11px; cursor: pointer; padding: 10px 0; }
+    .text-btn:hover { color: var(--lime); }
+    .feature-index { align-self: end; justify-self: end; margin: 0 22px 18px 0; font: 10px var(--mono); color: #ffffffa6; }
+    .strip { margin-top: 27px; padding: 13px 0; display: flex; align-items: center; justify-content: space-between; gap: 14px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .strip-label { white-space: nowrap; font: 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+    .date-list { display: flex; align-items: center; gap: 7px; overflow-x: auto; scrollbar-width: none; }
+    .date-list::-webkit-scrollbar { display: none; }
+    .date-btn { min-width: 75px; height: 46px; padding: 5px 10px; border: 1px solid transparent; background: transparent; cursor: pointer; text-align: center; }
+    .date-btn small { display: block; color: var(--muted); font: 9px var(--mono); text-transform: uppercase; }
+    .date-btn strong { display: block; margin-top: 3px; font-size: 12px; }
+    .date-btn.selected { border-color: var(--ink); background: var(--ink); color: white; }
+    .date-btn.selected small { color: #d2cfc5; }
+    .list-head { display: flex; justify-content: space-between; align-items: end; gap: 20px; padding: 38px 0 20px; }
+    .list-head h2 { margin: 0; font: 600 31px/1.1 var(--serif); }
+    .list-head p { margin: 7px 0 0; color: var(--muted); font-size: 11px; }
+    .browse-tools { display: flex; align-items: center; gap: 17px; }
+    .search-wrap { display: flex; gap: 8px; align-items: center; border-bottom: 1px solid #aaa59a; padding: 8px 0; }
+    .search-wrap span { color: var(--red); font-size: 16px; }
+    .search-wrap input { width: 145px; border: 0; background: transparent; outline: 0; font-size: 11px; }
+    .search-wrap input::placeholder { color: #8b877e; }
+    .filters { display: flex; gap: 6px; flex-wrap: wrap; padding-bottom: 17px; }
+    .filter-btn { padding: 7px 12px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: #65645d; font-size: 10px; cursor: pointer; }
+    .filter-btn:hover { border-color: var(--ink); color: var(--ink); }
+    .filter-btn.selected { background: var(--ink); color: white; border-color: var(--ink); }
+    .movie-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 26px 18px; }
+    .movie-card { min-width: 0; animation: arrive .45s both; }
+    @keyframes arrive { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+    .poster { position: relative; aspect-ratio: 1.24 / 1; overflow: hidden; background: #d7d0c3; }
+    .poster img { width: 100%; height: 100%; display: block; object-fit: cover; transition: transform .45s; }
+    .movie-card:hover .poster img { transform: scale(1.035); }
+    .rating { position: absolute; top: 10px; left: 10px; background: var(--paper); padding: 6px 8px; color: var(--ink); font: 10px var(--mono); }
+    .rating b { color: var(--red); }
+    .poster-kind { position: absolute; bottom: 10px; right: 10px; background: var(--lime); color: var(--ink); padding: 6px 8px; font: 9px var(--mono); text-transform: uppercase; }
+    .movie-info { display: flex; justify-content: space-between; align-items: start; gap: 8px; padding: 12px 0 0; }
+    .movie-info h3 { margin: 0; font: 600 18px/1.2 var(--serif); }
+    .movie-info p { margin: 5px 0 0; color: var(--muted); font: 10px var(--mono); }
+    .price { flex: none; padding-top: 2px; font: 10px var(--mono); color: var(--muted); }
+    .movie-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; border-top: 1px solid var(--line); padding-top: 10px; }
+    .show-count { color: #63635c; font: 9px var(--mono); text-transform: uppercase; }
+    .book-link { border: 0; padding: 5px 0 5px 8px; background: transparent; color: var(--red-dark); font-size: 11px; font-weight: 700; cursor: pointer; }
+    .book-link:hover { color: var(--ink); }
+    .empty-state { display: none; padding: 45px 10px; text-align: center; color: var(--muted); font: 13px var(--mono); }
+    .footer { border-top: 1px solid var(--line); display: flex; justify-content: space-between; padding: 19px 0; color: var(--muted); font: 9px var(--mono); text-transform: uppercase; letter-spacing: .06em; }
+    .footer strong { color: var(--ink); font-weight: 500; }
+
+    .overlay { position: fixed; inset: 0; z-index: 10; display: none; align-items: stretch; justify-content: end; background: #171814a6; }
+    .overlay.open { display: flex; animation: fade-in .2s both; }
+    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+    .drawer { width: min(520px, 100%); height: 100%; overflow-y: auto; background: var(--paper); padding: 25px 32px 24px; animation: slide-in .25s both; }
+    @keyframes slide-in { from { transform: translateX(18px); } to { transform: translateX(0); } }
+    .drawer-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 17px; }
+    .drawer-kicker { color: var(--red-dark); font: 10px var(--mono); text-transform: uppercase; letter-spacing: .1em; }
+    .close-btn { width: 34px; height: 34px; border: 1px solid var(--line); background: transparent; cursor: pointer; font-size: 18px; line-height: 1; }
+    .close-btn:hover { border-color: var(--ink); }
+    .step-heading { display: flex; justify-content: space-between; align-items: center; margin: 24px 0 7px; }
+    .step-heading h2 { margin: 0; font: 600 26px var(--serif); }
+    .step-count { font: 10px var(--mono); color: var(--muted); }
+    .chosen-film { margin: 0; color: var(--muted); font-size: 12px; }
+    .drawer-section { margin-top: 27px; }
+    .section-label { margin: 0 0 11px; font: 10px var(--mono); text-transform: uppercase; letter-spacing: .09em; }
+    .venue-select { width: 100%; padding: 13px; border: 1px solid var(--line); border-radius: 0; background: transparent; font-size: 12px; }
+    .times { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .time-btn { min-height: 53px; border: 1px solid var(--line); background: transparent; cursor: pointer; text-align: left; padding: 9px 10px; }
+    .time-btn strong { display: block; font-size: 12px; }
+    .time-btn small { display: block; margin-top: 4px; color: var(--muted); font: 9px var(--mono); }
+    .time-btn.selected { border-color: var(--red); box-shadow: inset 0 0 0 1px var(--red); }
+    .time-btn.sold { opacity: .42; cursor: not-allowed; }
+    .drawer-footer { position: sticky; bottom: -24px; margin: 32px -32px -24px; padding: 17px 32px 24px; background: var(--paper); border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .total-label { color: var(--muted); font: 9px var(--mono); text-transform: uppercase; }
+    .total-value { margin-top: 3px; font: 600 19px var(--serif); }
+    .continue-btn { min-width: 164px; }
+    .continue-btn:disabled { background: #aaa69c; cursor: not-allowed; transform: none; }
+    .seats-wrap { margin: 30px 0 20px; }
+    .screen { margin: 0 auto 29px; width: 76%; padding-bottom: 9px; text-align: center; border-bottom: 3px solid #838076; color: var(--muted); font: 9px var(--mono); letter-spacing: .22em; }
+    .seat-map { display: grid; grid-template-columns: 16px repeat(10, 1fr) 16px; gap: 7px 5px; align-items: center; }
+    .row-label { color: var(--muted); text-align: center; font: 9px var(--mono); }
+    .seat { width: 100%; aspect-ratio: 1; min-width: 19px; max-width: 29px; justify-self: center; border: 1px solid #a8a397; background: transparent; cursor: pointer; border-radius: 5px 5px 2px 2px; font: 8px var(--mono); }
+    .seat:hover:not(:disabled) { border-color: var(--red); }
+    .seat.selected { border-color: var(--red); background: var(--red); color: white; }
+    .seat.booked { background: #d4d0c7; border-color: #d4d0c7; cursor: not-allowed; }
+    .seat.premium { border-color: var(--blue); }
+    .seat-legend { display: flex; justify-content: center; gap: 16px; margin-top: 18px; color: var(--muted); font: 9px var(--mono); }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 11px; height: 11px; border: 1px solid #a8a397; border-radius: 3px; }
+    .legend-swatch.booked { background: #d4d0c7; border-color: #d4d0c7; }
+    .legend-swatch.chosen { background: var(--red); border-color: var(--red); }
+    .selected-summary { color: var(--muted); text-align: center; font: 10px var(--mono); }
+    .confirmation { text-align: center; padding: 34px 4px 16px; }
+    .confirmation-mark { margin: 0 auto 17px; width: 55px; height: 55px; display: grid; place-items: center; background: var(--lime); font-size: 24px; }
+    .confirmation h2 { margin: 0; font: 600 31px var(--serif); }
+    .confirmation p { color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .ticket { margin: 23px 0; padding: 18px; border: 1px dashed #aaa397; text-align: left; }
+    .ticket-title { font: 600 18px var(--serif); }
+    .ticket-details { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+    .ticket-details small { display: block; color: var(--muted); font: 9px var(--mono); text-transform: uppercase; }
+    .ticket-details strong { display: block; margin-top: 4px; font-size: 11px; }
+    .full-btn { width: 100%; }
+    .toast { position: fixed; z-index: 20; bottom: 20px; left: 50%; transform: translate(-50%, 20px); padding: 11px 16px; background: var(--ink); color: white; font: 10px var(--mono); opacity: 0; pointer-events: none; transition: .2s; }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (max-width: 900px) {
+      .shell { width: min(100% - 44px, 720px); }
+      .nav { gap: 18px; }
+      .nav a:nth-child(3) { display: none; }
+      .feature { min-height: 300px; grid-template-columns: 1fr .2fr; }
+      .feature-copy { padding-left: 32px; }
+      .movie-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 16px; }
+      .poster { aspect-ratio: 1.38 / 1; }
+    }
+    @media (max-width: 580px) {
+      .shell { width: calc(100% - 32px); }
+      .topbar { height: 64px; }
+      .nav { display: none; }
+      .header-tools { gap: 4px; }
+      .avatar { width: 31px; height: 31px; }
+      .city-select { max-width: 115px; font-size: 11px; }
+      .intro { padding: 30px 0 19px; display: block; }
+      h1 { font-size: 43px; }
+      .intro-note { max-width: none; margin-top: 13px; font-size: 11px; }
+      .feature { min-height: 315px; display: block; }
+      .feature::before { background: linear-gradient(90deg, #171814ee 0%, #171814a8 60%, #17181442 100%), url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1000&q=80') 57% center/cover; }
+      .feature-copy { padding: 28px 22px; }
+      .feature h2 { font-size: 38px; }
+      .feature-index { position: absolute; right: 0; bottom: 0; }
+      .strip { align-items: start; flex-direction: column; gap: 8px; }
+      .date-list { width: 100%; }
+      .date-btn { min-width: 68px; }
+      .list-head { align-items: start; flex-direction: column; padding-top: 31px; }
+      .list-head h2 { font-size: 28px; }
+      .browse-tools { width: 100%; justify-content: space-between; }
+      .search-wrap { flex: 1; }
+      .search-wrap input { width: 100%; }
+      .filters { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 13px; }
+      .filter-btn { flex: none; }
+      .movie-grid { gap: 23px 12px; }
+      .poster { aspect-ratio: .92 / 1; }
+      .movie-info h3 { font-size: 16px; }
+      .movie-info p { font-size: 9px; }
+      .price { font-size: 9px; }
+      .movie-bottom { align-items: start; gap: 4px; }
+      .show-count { font-size: 8px; }
+      .book-link { font-size: 10px; }
+      .footer { gap: 14px; font-size: 8px; }
+      .drawer { padding: 20px 19px 20px; }
+      .drawer-footer { bottom: -20px; margin: 30px -19px -20px; padding: 14px 19px 20px; }
+      .times { gap: 6px; }
+      .time-btn { padding: 8px 7px; }
+      .seat-map { gap: 6px 3px; }
+      .seat { min-width: 17px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <header class="shell topbar">
+    <a class="brand" href="#top" aria-label="Screen Club home">
+      <span class="brand-mark" aria-hidden="true">S</span>
+      <span class="brand-name">Screen Club<small>the good seats</small></span>
+    </a>
+    <nav class="nav" aria-label="Main navigation">
+      <a class="active" href="#films">Now showing</a>
+      <a href="#cinemas">Cinemas</a>
+      <a href="#offers" id="offers-link">Offers</a>
+    </nav>
+    <div class="header-tools">
+      <label class="sr-only" for="city">Choose city</label>
+      <select class="city-select" id="city" aria-label="Choose city">
+        <option>Chennai, IN</option><option>Bengaluru, IN</option><option>Mumbai, IN</option><option>Hyderabad, IN</option>
+      </select>
+      <div class="avatar" aria-label="Your account">DK</div>
+    </div>
+  </header>
+  <main class="shell" id="top">
+    <section class="intro" aria-labelledby="page-title">
+      <div><div class="eyebrow"><span class="live-dot"></span> Your next night out starts here</div><h1 id="page-title">The lights go down.<br><em>Your evening begins.</em></h1></div>
+      <p class="intro-note">Big-screen stories, neighbourhood cinemas, and seats with your name on them.</p>
+    </section>
+    <section class="feature" aria-label="Featured movie">
+      <div class="feature-copy">
+        <span class="feature-tag">Tonight's feature &nbsp;·&nbsp; 4.8 ★</span>
+        <h2>The Last<br>Lightkeeper</h2>
+        <div class="feature-subtitle">Somewhere between the stars and the sea.</div>
+        <div class="feature-meta"><span>Sci-fi drama</span><span>2h 08m</span><span>UA 13+</span></div>
+        <div class="feature-actions"><button class="primary-btn book-trigger" data-movie="The Last Lightkeeper">Find a showtime &nbsp; ↗</button><button class="text-btn" data-scroll-films>Explore all films ↓</button></div>
+      </div>
+      <div class="feature-index">SC / FEATURE 001</div>
+    </section>
+    <section class="strip" aria-label="Choose a movie date">
+      <div class="strip-label">Screening on</div>
+      <div class="date-list" id="date-list"></div>
+    </section>
+    <section id="films" aria-labelledby="films-title">
+      <div class="list-head">
+        <div><h2 id="films-title">Now showing</h2><p id="result-count">Pick a story. We'll save you a seat.</p></div>
+        <div class="browse-tools">
+          <div class="search-wrap"><span aria-hidden="true">⌕</span><label class="sr-only" for="search">Search films</label><input id="search" type="search" placeholder="Find a film…" autocomplete="off"></div>
+        </div>
+      </div>
+      <div class="filters" role="group" aria-label="Filter by genre">
+        <button class="filter-btn selected" data-genre="All">All films</button><button class="filter-btn" data-genre="Drama">Drama</button><button class="filter-btn" data-genre="Sci-fi">Sci-fi</button><button class="filter-btn" data-genre="Thriller">Thriller</button><button class="filter-btn" data-genre="Animation">Animation</button><button class="filter-btn" data-genre="Comedy">Comedy</button>
+      </div>
+      <div class="movie-grid" id="movie-grid"></div>
+      <div class="empty-state" id="empty-state">No films found. Try another title or genre.</div>
+    </section>
+    <footer class="footer" id="cinemas"><span><strong>SCREEN CLUB</strong> &nbsp;·&nbsp; Chennai & beyond</span><span id="offers">A little more magic, every screening.</span></footer>
+  </main>
+
+  <div class="overlay" id="booking-overlay" role="presentation">
+    <section class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" aria-describedby="drawer-subtitle">
+      <div class="drawer-head"><div class="drawer-kicker">Screen Club &nbsp; / &nbsp; Reservations</div><button class="close-btn" id="close-drawer" aria-label="Close booking">×</button></div>
+      <div id="booking-content"></div>
+    </section>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+    const films = [
+      { title: 'The Last Lightkeeper', genre: 'Sci-fi', length: '2h 08m', rating: '4.8', price: 260, tag: 'Premiere', image: 'photo-1446776811953-b23d57bd21aa', position: 'center 44%', shows: 8 },
+      { title: 'A Quiet Kind of Blue', genre: 'Drama', length: '1h 52m', rating: '4.6', price: 220, tag: 'Audience pick', image: 'photo-1470770841072-f978cf4d019e', position: 'center 58%', shows: 6 },
+      { title: 'Midnight Signal', genre: 'Thriller', length: '2h 01m', rating: '4.5', price: 240, tag: 'New', image: 'photo-1519608487953-e999c86e7455', position: 'center 48%', shows: 5 },
+      { title: 'Small Wonders', genre: 'Animation', length: '1h 36m', rating: '4.9', price: 190, tag: 'Family', image: 'photo-1470252649378-9c29740c9fa8', position: 'center 55%', shows: 7 },
+      { title: 'The Long Weekend', genre: 'Comedy', length: '1h 48m', rating: '4.4', price: 210, tag: 'Feel-good', image: 'photo-1500530855697-b586d89ba3ee', position: 'center 52%', shows: 4 },
+      { title: 'After the Monsoon', genre: 'Drama', length: '2h 14m', rating: '4.7', price: 230, tag: 'Critics love', image: 'photo-1518837695005-2083093ee35b', position: 'center 62%', shows: 6 },
+      { title: 'Orbit 9', genre: 'Sci-fi', length: '1h 57m', rating: '4.3', price: 250, tag: 'Big screen', image: 'photo-1451187580459-43490279c0fa', position: 'center 50%', shows: 5 },
+      { title: 'The Last Encore', genre: 'Thriller', length: '1h 55m', rating: '4.6', price: 220, tag: 'Limited shows', image: 'photo-1516280440614-37939bbacd81', position: 'center 45%', shows: 3 }
+    ];
+    const showtimes = ['10:15 AM', '1:30 PM', '4:45 PM', '7:20 PM', '9:55 PM'];
+    const state = { genre: 'All', query: '', date: new Date(), movie: null, time: '', seats: [], step: 1, venue: 'PVR Luxe · Express Avenue' };
+    const grid = document.getElementById('movie-grid');
+    const money = amount => '₹' + amount.toLocaleString('en-IN');
+    const imageUrl = (id, width = 700) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=82`;
+
+    function renderDates() {
+      const host = document.getElementById('date-list');
+      host.innerHTML = '';
+      for (let offset = 0; offset < 6; offset++) {
+        const date = new Date(); date.setDate(date.getDate() + offset);
+        const button = document.createElement('button');
+        button.className = 'date-btn' + (offset === 0 ? ' selected' : '');
+        button.type = 'button'; button.dataset.offset = offset;
+        button.innerHTML = `<small>${offset === 0 ? 'Today' : date.toLocaleDateString('en-IN', { weekday: 'short' })}</small><strong>${date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</strong>`;
+        button.addEventListener('click', () => {
+          host.querySelectorAll('.date-btn').forEach(item => item.classList.remove('selected'));
+          button.classList.add('selected'); state.date = date;
+        });
+        host.append(button);
+      }
+    }
+
+    function renderFilms() {
+      const results = films.filter(film => (state.genre === 'All' || film.genre === state.genre) && film.title.toLowerCase().includes(state.query));
+      grid.innerHTML = results.map((film, index) => `
+        <article class="movie-card" style="animation-delay:${index * 45}ms">
+          <div class="poster"><img src="${imageUrl(film.image)}" alt="Atmospheric still for ${film.title}" loading="lazy" style="object-position:${film.position}"><span class="rating"><b>★</b> ${film.rating}</span><span class="poster-kind">${film.tag}</span></div>
+          <div class="movie-info"><div><h3>${film.title}</h3><p>${film.genre} &nbsp;·&nbsp; ${film.length}</p></div><span class="price">from ${money(film.price)}</span></div>
+          <div class="movie-bottom"><span class="show-count">${film.shows} showtimes</span><button class="book-link book-trigger" data-movie="${film.title}">Book tickets &nbsp;↗</button></div>
+        </article>`).join('');
+      document.getElementById('empty-state').style.display = results.length ? 'none' : 'block';
+      document.getElementById('result-count').textContent = `${results.length} ${results.length === 1 ? 'film' : 'films'} · Pick a story. We'll save you a seat.`;
+    }
+
+    document.querySelector('.filters').addEventListener('click', event => {
+      const button = event.target.closest('[data-genre]'); if (!button) return;
+      state.genre = button.dataset.genre;
+      document.querySelectorAll('.filter-btn').forEach(item => item.classList.toggle('selected', item === button));
+      renderFilms();
+    });
+    document.getElementById('search').addEventListener('input', event => { state.query = event.target.value.trim().toLowerCase(); renderFilms(); });
+    document.querySelectorAll('[data-scroll-films]').forEach(button => button.addEventListener('click', () => document.getElementById('films').scrollIntoView({ behavior: 'smooth' })));
+
+    const overlay = document.getElementById('booking-overlay');
+    const content = document.getElementById('booking-content');
+    function openBooking(title) {
+      state.movie = films.find(film => film.title === title) || { title, genre: 'Sci-fi', length: '2h 08m', price: 260 };
+      state.time = ''; state.seats = []; state.step = 1;
+      renderBooking(); overlay.classList.add('open'); document.body.style.overflow = 'hidden';
+      document.getElementById('close-drawer').focus();
+    }
+    function closeBooking() { overlay.classList.remove('open'); document.body.style.overflow = ''; }
+    document.addEventListener('click', event => {
+      const trigger = event.target.closest('.book-trigger'); if (trigger) openBooking(trigger.dataset.movie);
+    });
+    document.getElementById('close-drawer').addEventListener('click', closeBooking);
+    overlay.addEventListener('click', event => { if (event.target === overlay) closeBooking(); });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape' && overlay.classList.contains('open')) closeBooking(); });
+
+    function renderBooking() {
+      if (state.step === 3) { renderConfirmation(); return; }
+      const selectedFilm = state.movie;
+      const seatCost = state.seats.reduce((sum, seat) => sum + (seat.charCodeAt(0) >= 70 ? selectedFilm.price + 60 : selectedFilm.price), 0);
+      const title = state.step === 1 ? 'Choose your show' : 'Pick your seats';
+      content.innerHTML = `<div class="step-heading"><h2 id="drawer-title">${title}</h2><span class="step-count">0${state.step} / 02</span></div>
+        <p class="chosen-film" id="drawer-subtitle">${selectedFilm.title} &nbsp;·&nbsp; ${selectedFilm.length}</p>
+        ${state.step === 1 ? `<div class="drawer-section"><h3 class="section-label">Your cinema</h3><select class="venue-select" id="venue"><option>PVR Luxe · Express Avenue</option><option>AGS Cinemas · T. Nagar</option><option>INOX · Chennai Citi Centre</option><option>Sathyam Cinemas · Royapettah</option></select></div>
+          <div class="drawer-section"><h3 class="section-label">${state.date.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })} &nbsp;·&nbsp; Tamil / English</h3><div class="times">${showtimes.map((time, i) => `<button class="time-btn ${i === 2 ? 'sold' : ''} ${state.time === time ? 'selected' : ''}" data-time="${time}" ${i === 2 ? 'disabled' : ''}><strong>${time}</strong><small>${i === 2 ? 'Filling fast' : 'Available'}</small></button>`).join('')}</div></div>` : `<div class="seats-wrap"><div class="screen">SCREEN</div><div class="seat-map" id="seat-map"></div><div class="seat-legend"><span class="legend-item"><i class="legend-swatch"></i> Available</span><span class="legend-item"><i class="legend-swatch chosen"></i> Selected</span><span class="legend-item"><i class="legend-swatch booked"></i> Taken</span></div><p class="selected-summary" id="selected-summary">Select up to 8 seats · Row A–E ${money(selectedFilm.price)} &nbsp; / &nbsp; F–H ${money(selectedFilm.price + 60)}</p></div>`}
+        <div class="drawer-footer"><div><div class="total-label">${state.step === 1 ? 'Ticket price from' : `${state.seats.length} seat${state.seats.length === 1 ? '' : 's'} selected`}</div><div class="total-value">${money(state.step === 1 ? selectedFilm.price : seatCost)}</div></div><button class="primary-btn continue-btn" id="continue-btn" ${state.step === 1 ? 'disabled' : state.seats.length === 0 ? 'disabled' : ''}>${state.step === 1 ? 'Choose a time →' : 'Reserve seats →'}</button></div>`;
+
+      const venue = document.getElementById('venue');
+      if (venue) { venue.value = state.venue; venue.addEventListener('change', () => { state.venue = venue.value; }); }
+      content.querySelectorAll('[data-time]').forEach(button => button.addEventListener('click', () => {
+        state.time = button.dataset.time;
+        content.querySelectorAll('[data-time]').forEach(item => item.classList.toggle('selected', item === button));
+        document.getElementById('continue-btn').disabled = false;
+      }));
+      if (state.step === 2) renderSeatMap();
+      document.getElementById('continue-btn').addEventListener('click', () => {
+        if (state.step === 1 && state.time) { state.step = 2; renderBooking(); }
+        else if (state.step === 2 && state.seats.length) { state.step = 3; renderBooking(); }
+      });
+    }
+
+    function renderSeatMap() {
+      const map = document.getElementById('seat-map');
+      const taken = new Set(['A3', 'A4', 'B7', 'C2', 'C3', 'D8', 'E6', 'F2', 'F3', 'G7', 'H9']);
+      map.innerHTML = '<span></span>' + Array.from({ length: 10 }, (_, i) => `<span class="row-label">${i + 1}</span>`).join('') + '<span></span>';
+      for (const row of 'ABCDEFGH') {
+        map.insertAdjacentHTML('beforeend', `<span class="row-label">${row}</span>`);
+        for (let number = 1; number <= 10; number++) {
+          const code = `${row}${number}`; const button = document.createElement('button');
+          button.type = 'button'; button.className = 'seat' + ('FGH'.includes(row) ? ' premium' : '') + (taken.has(code) ? ' booked' : '') + (state.seats.includes(code) ? ' selected' : '');
+          button.textContent = number; button.setAttribute('aria-label', `Seat ${code}${taken.has(code) ? ', unavailable' : state.seats.includes(code) ? ', selected' : ', available'}`); button.disabled = taken.has(code);
+          button.addEventListener('click', () => {
+            if (state.seats.includes(code)) state.seats = state.seats.filter(seat => seat !== code);
+            else if (state.seats.length < 8) state.seats.push(code);
+            else { showToast('You can select up to 8 seats.'); return; }
+            renderBooking();
+          });
+          map.append(button);
+        }
+        map.insertAdjacentHTML('beforeend', `<span class="row-label">${row}</span>`);
+      }
+    }
+
+    function renderConfirmation() {
+      const code = 'SC' + Math.random().toString(36).slice(2, 8).toUpperCase();
+      const count = state.seats.length;
+      const total = state.seats.reduce((sum, seat) => sum + (seat.charCodeAt(0) >= 70 ? state.movie.price + 60 : state.movie.price), 0);
+      content.innerHTML = `<div class="confirmation"><div class="confirmation-mark">✓</div><div class="drawer-kicker">Reservation confirmed</div><h2 id="drawer-title">It's movie time.</h2><p id="drawer-subtitle">Your seats are held. A little big-screen magic is on its way.</p><div class="ticket"><div class="ticket-title">${state.movie.title}</div><div class="ticket-details"><div><small>Cinema</small><strong>${state.venue}</strong></div><div><small>Showtime</small><strong>${state.time}</strong></div><div><small>Seats</small><strong>${state.seats.join(', ')}</strong></div><div><small>Booking ref</small><strong>${code}</strong></div></div></div><p>${count} ticket${count === 1 ? '' : 's'} &nbsp;·&nbsp; ${money(total)}<br><small>Payment will be collected at checkout.</small></p><button class="primary-btn full-btn" id="done-btn">Lovely. Done.</button></div>`;
+      document.getElementById('done-btn').addEventListener('click', closeBooking);
+    }
+
+    let toastTimeout;
+    function showToast(message) {
+      const toast = document.getElementById('toast'); toast.textContent = message; toast.classList.add('show');
+      clearTimeout(toastTimeout); toastTimeout = setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+    document.getElementById('city').addEventListener('change', event => showToast(`Showing cinemas near ${event.target.value.split(',')[0]}.`));
+    document.getElementById('offers-link').addEventListener('click', event => { event.preventDefault(); showToast('Student Tuesdays: 20% off every ticket.'); });
+    renderDates(); renderFilms();
+  </script>
+</body>
+</html>
